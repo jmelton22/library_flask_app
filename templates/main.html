@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <ul>
+        {% for test_id, test_str in test %}
+            <li>
+                <p>{{ test_id }} {{ test_str }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
