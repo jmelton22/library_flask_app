@@ -11,7 +11,8 @@ def main():
     connection = pymysql.connect(host=app.config['HOSTNAME'],
                                  user=app.config['USERNAME'],
                                  password=app.config['PASSWORD'],
-                                 db=app.config['DATABASE'])
+                                 db=app.config['DATABASE'],
+                                 cursorclass=pymysql.cursors.DictCursor)
 
     try:
         with connection.cursor() as cursor:

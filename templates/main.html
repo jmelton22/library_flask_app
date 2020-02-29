@@ -6,9 +6,9 @@
 </head>
 <body>
     <ul>
-        {% for test_id, test_str in test %}
+        {% for row in test %}
             <li>
-                <p>{{ test_id }} {{ test_str }}</p>
+                <p>{{ row['test_id'] }}: {{ row['test_col'] }}</p>
             </li>
         {% endfor %}
     </ul>
