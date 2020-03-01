@@ -5,6 +5,8 @@ import pymysql
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# TODO: Set up models for database objects?
+
 
 @app.route('/')
 def main():
@@ -19,7 +21,7 @@ def main():
             query = 'SELECT * FROM flask_test.test_tbl'
             cursor.execute(query)
             result = cursor.fetchall()
-            return render_template('main.html', test=result)
+            return render_template('index.html', test=result)
 
     except Exception as e:
         print(e)
