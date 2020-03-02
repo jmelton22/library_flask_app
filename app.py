@@ -9,7 +9,12 @@ app.config.from_object(Config)
 
 
 @app.route('/')
-def main():
+def index():
+    return render_template('index.html')
+
+
+@app.route('/books')
+def books():
     connection = pymysql.connect(host=app.config['HOSTNAME'],
                                  user=app.config['USERNAME'],
                                  password=app.config['PASSWORD'],
@@ -18,10 +23,15 @@ def main():
 
     try:
         with connection.cursor() as cursor:
-            query = 'SELECT * FROM flask_test.test_tbl'
+            query = (
+                'SELECT * '
+                'FROM book '
+                'JOIN author '
+                'ON book.author=author.author_id'
+            )
             cursor.execute(query)
             result = cursor.fetchall()
-            return render_template('index.html', test=result)
+            return result
 
     except Exception as e:
         print(e)
