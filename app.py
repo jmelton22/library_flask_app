@@ -31,7 +31,7 @@ def books():
             )
             cursor.execute(query)
             result = cursor.fetchall()
-            return result
+            return render_template('books.html', books=result)
 
     except Exception as e:
         print(e)
