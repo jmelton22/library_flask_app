@@ -1,11 +1,29 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <ul>
+    <div class="row row-cols-3">
         {% for book in books %}
-            <li>
-                <p>{{ book }}</p>
-            </li>
+            <div class="col mt-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="card-title">{{ book['title'] }}</h3>
+                        {% if book['subtitle'] %}
+                            <p class="card-text"><i>{{ book['subtitle'] }}</i></p>
+                        {% endif %}
+                        {% if book['middle_name'] %}
+                            <p class="card-text">
+                                {{ '{} {}. {}'.format(book['first_name'].capitalize(),
+                                                      book['middle_name'][0].upper(),
+                                                      book['last_name'].capitalize()) }}
+                            </p>
+                        {% else %}
+                            <p class="card-text">
+                                {{ '{} {}'.format(book['first_name'].capitalize(), book['last_name'].capitalize()) }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 {% endblock %}
