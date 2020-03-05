@@ -24,7 +24,8 @@ def books():
     try:
         with connection.cursor() as cursor:
             query = (
-                'SELECT * '
+                'SELECT book.title, book.subtitle, book.num_pages, '
+                'author.first_name, author.middle_name, author.last_name '
                 'FROM book '
                 'JOIN author '
                 'ON book.author=author.author_id'
