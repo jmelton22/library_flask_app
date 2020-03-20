@@ -7,21 +7,21 @@
                 <div class="card h-100">
                     <div class="card-body">
                         <h3 class="card-title">
-                            <a href="{{ url_for('book', book_id=book['book_id']) }}">{{ book['title'] }}</a>
+                            <a class="card-link" href="{{ url_for('book', book_id=book['book_id']) }}">{{ book['title'] }}</a>
                         </h3>
                         {% if book['subtitle'] %}
                             <p class="card-text"><i>{{ book['subtitle'] }}</i></p>
                         {% endif %}
                         {% if book['middle_name'] %}
-                            <p class="card-text">
+                            <a class="card-link" href="{{ url_for('author', author_id=book['author']) }}">
                                 {{ '{} {}. {}'.format(book['first_name'].capitalize(),
                                                       book['middle_name'][0].upper(),
                                                       book['last_name'].capitalize()) }}
-                            </p>
+                            </a>
                         {% else %}
-                            <p class="card-text">
+                            <a class="card-link" href="{{ url_for('author', author_id=book['author']) }}">
                                 {{ '{} {}'.format(book['first_name'].capitalize(), book['last_name'].capitalize()) }}
-                            </p>
+                            </a>
                         {% endif %}
                     </div>
                 </div>

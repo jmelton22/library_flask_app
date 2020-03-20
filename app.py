@@ -66,7 +66,30 @@ def book(book_id):
 
 @app.route('/author/<author_id>')
 def author(author_id):
-    pass
+    connection = connect_to_db()
+    try:
+        with connection.cursor() as cursor:
+            query = (
+                'SELECT * '
+                'FROM author '
+                f'WHERE author_id={author_id}'
+            )
+            cursor.execute(query)
+            result_author = cursor.fetchone()
+
+            query = (
+                'SELECT * '
+                'FROM book '
+                f'WHERE book.author={author_id}'
+            )
+            cursor.execute(query)
+            result_books = cursor.fetchall()
+            return render_template('author.html', author=result_author, books=result_books)
+
+    except Exception as e:
+        print(e)
+    finally:
+        connection.close()
 
 
 if __name__ == '__main__':

@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    {% if author['middle_name'] %}
+        <h2>
+            {{ '{} {}. {}'.format(author['first_name'].capitalize(),
+                                  author['middle_name'][0].upper(),
+                                  author['last_name'].capitalize()) }}
+        </h2>
+    {% else %}
+        <h2>
+            {{ '{} {}'.format(author['first_name'].capitalize(), author['last_name'].capitalize()) }}
+        </h2>
+    {% endif %}
+
+    <p>Biography:
+        <br>
+        {{ author['bio'] }}
+    </p>
+
+    <p>Books:</p>
+    <ul>
+    {% for book in books %}
+        <li>
+            {{ book['title'] }}
+            {% if book['subtitle'] %}
+                - <em>{{ book['subtitle'] }}</em>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}
