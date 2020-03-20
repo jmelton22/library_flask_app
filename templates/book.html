@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h2>{{ book['title'] }}</h2>
+    {% if book['subtitle'] %}
+        <h5><i>{{ book['subtitle'] }}</i></h5>
+    {% endif %}
+    <br>
+    {% if book['middle_name'] %}
+        <p>Author:
+            {{ '{} {}. {}'.format(book['first_name'].capitalize(),
+                                  book['middle_name'][0].upper(),
+                                  book['last_name'].capitalize()) }}
+        </p>
+    {% else %}
+        <p> Author:
+            {{ '{} {}'.format(book['first_name'].capitalize(), book['last_name'].capitalize()) }}
+        </p>
+    {% endif %}
+
+    <p>Number of pages: {{ book['num_pages'] }}</p>
+    <p>Description:
+        <br>
+        {{ book['description'] }}
+    </p>
+{% endblock %}
