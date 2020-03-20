@@ -8,6 +8,14 @@ app.config.from_object(Config)
 # TODO: Set up models for database objects?
 
 
+def connect_to_db():
+    return pymysql.connect(host=app.config['HOSTNAME'],
+                           user=app.config['USERNAME'],
+                           password=app.config['PASSWORD'],
+                           db=app.config['DATABASE'],
+                           cursorclass=pymysql.cursors.DictCursor)
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -15,12 +23,7 @@ def index():
 
 @app.route('/books')
 def books():
-    connection = pymysql.connect(host=app.config['HOSTNAME'],
-                                 user=app.config['USERNAME'],
-                                 password=app.config['PASSWORD'],
-                                 db=app.config['DATABASE'],
-                                 cursorclass=pymysql.cursors.DictCursor)
-
+    connection = connect_to_db()
     try:
         with connection.cursor() as cursor:
             query = (
@@ -41,12 +44,7 @@ def books():
 
 @app.route('/book/<book_id>')
 def book(book_id):
-    connection = pymysql.connect(host=app.config['HOSTNAME'],
-                                 user=app.config['USERNAME'],
-                                 password=app.config['PASSWORD'],
-                                 db=app.config['DATABASE'],
-                                 cursorclass=pymysql.cursors.DictCursor)
-
+    connection = connect_to_db()
     try:
         with connection.cursor() as cursor:
             query = (
@@ -57,8 +55,8 @@ def book(book_id):
                 f'WHERE book.book_id={book_id}'
             )
             cursor.execute(query)
-            result = cursor.fetchall()
-            return render_template('book.html', book=result[0])
+            result = cursor.fetchone()
+            return render_template('book.html', book=result)
 
     except Exception as e:
         print(e)
