@@ -7,7 +7,7 @@
         <p>
             {{ form.email.label }}
             <br>
-            {{ form.email(size=64) }}
+            {{ form.email(size=32) }}
             <br>
             {% for error in form.email.errors %}
                 <span class="text-danger">[{{ error }}]</span>

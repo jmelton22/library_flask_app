@@ -1,6 +1,5 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.ext.automap import automap_base
 from config import Config
 from forms import LoginForm, RegisterForm
 import pymysql
@@ -9,14 +8,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# Create database and import table classes
 db = SQLAlchemy(app)
-
-Base = automap_base()
-Base.prepare(db.engine, reflect=True)
-
-Author = Base.classes.author
-Book = Base.classes.book
-User = Base.classes.user
+from models import User, Book, Author
 
 
 def connect_to_db():
@@ -36,7 +30,8 @@ def index():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        new_user = User(email=form.email.data, password=form.password.data)
+        hashed_password = generate_password_hash(form.password.data, method='sha256')
+        new_user = User(email=form.email.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('index'))
@@ -48,7 +43,12 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        return redirect(url_for('index'))
+        temp_user = db.session.query(User).filter(User.email == form.email.data).first()
+        if temp_user:
+            if check_password_hash(temp_user.password, form.password.data):
+                return redirect(url_for('index'))
+
+        return '<h1>Invalid email or password</h1>'
 
     return render_template('login.html', title='Sign In', form=form)
 
