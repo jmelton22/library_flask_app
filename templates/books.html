@@ -13,13 +13,13 @@
                             <p class="card-text"><i>{{ book['subtitle'] }}</i></p>
                         {% endif %}
                         {% if book['middle_name'] %}
-                            <a class="card-link" href="{{ url_for('author', author_id=book['author']) }}">
+                            <a class="card-link" href="{{ url_for('author', author_id=book['author_id']) }}">
                                 {{ '{} {}. {}'.format(book['first_name'].capitalize(),
                                                       book['middle_name'][0].upper(),
                                                       book['last_name'].capitalize()) }}
                             </a>
                         {% else %}
-                            <a class="card-link" href="{{ url_for('author', author_id=book['author']) }}">
+                            <a class="card-link" href="{{ url_for('author', author_id=book['author_id']) }}">
                                 {{ '{} {}'.format(book['first_name'].capitalize(), book['last_name'].capitalize()) }}
                             </a>
                         {% endif %}

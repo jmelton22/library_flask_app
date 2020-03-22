@@ -1,11 +1,22 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.automap import automap_base
 from config import Config
+from forms import LoginForm, RegisterForm
 import pymysql
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# TODO: Set up models for database objects?
+db = SQLAlchemy(app)
+
+Base = automap_base()
+Base.prepare(db.engine, reflect=True)
+
+Author = Base.classes.author
+Book = Base.classes.book
+User = Base.classes.user
 
 
 def connect_to_db():
@@ -23,11 +34,27 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    pass
+    form = RegisterForm()
+    if form.validate_on_submit():
+        new_user = User(email=form.email.data, password=form.password.data)
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('index'))
+
+    return render_template('register.html', title='Sign Up', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        return redirect(url_for('index'))
+
+    return render_template('login.html', title='Sign In', form=form)
+
+
+@app.route('/user/<user_id>')
+def user(user_id):
     pass
 
 
@@ -40,7 +67,7 @@ def books():
                 'SELECT * '
                 'FROM book '
                 'JOIN author '
-                'ON book.author=author.author_id'
+                'USING (author_id)'
             )
             cursor.execute(query)
             result = cursor.fetchall()
@@ -61,7 +88,7 @@ def book(book_id):
                 'SELECT * '
                 'FROM book '
                 'JOIN author '
-                'ON book.author=author.author_id '
+                'USING (author_id)'
                 f'WHERE book.book_id={book_id}'
             )
             cursor.execute(query)
@@ -90,7 +117,7 @@ def author(author_id):
             query = (
                 'SELECT * '
                 'FROM book '
-                f'WHERE book.author={author_id}'
+                f'WHERE book.author_id={author_id}'
             )
             cursor.execute(query)
             result_books = cursor.fetchall()
