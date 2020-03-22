@@ -7,6 +7,8 @@ from flask_login import LoginManager, login_required, login_user, logout_user, c
 
 app = Flask(__name__)
 app.config.from_object(Config)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
 
 # Create database and import table classes
 db = SQLAlchemy(app)
@@ -26,9 +28,15 @@ def register():
         new_user = User(email=form.email.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
+        login_user(new_user)
         return redirect(url_for('index'))
 
     return render_template('register.html', title='Sign Up', form=form)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -38,11 +46,19 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             if check_password_hash(user.password, form.password.data):
+                login_user(user, remember=form.remember_me.data)
                 return redirect(url_for('index'))
 
         return '<h1>Invalid email or password</h1>'
 
     return render_template('login.html', title='Sign In', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 
 @app.route('/books')

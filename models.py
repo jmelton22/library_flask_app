@@ -6,7 +6,7 @@ from app import db
 Base = automap_base()
 
 
-class User(Base, db.Model):
+class User(UserMixin, Base, db.Model):
     __tablename__ = 'user'
 
 
@@ -19,4 +19,3 @@ class Author(Base, db.Model):
 
 
 Base.prepare(db.engine, reflect=True)
-
