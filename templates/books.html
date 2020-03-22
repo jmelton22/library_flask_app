@@ -2,25 +2,25 @@
 
 {% block content %}
     <div class="row row-cols-3">
-        {% for book in books %}
+        {% for book, author in books %}
             <div class="col mt-4">
                 <div class="card h-100">
                     <div class="card-body">
                         <h3 class="card-title">
-                            <a class="card-link" href="{{ url_for('book', book_id=book['book_id']) }}">{{ book['title'] }}</a>
+                            <a class="card-link" href="{{ url_for('book', book_id=book.book_id) }}">{{ book.title }}</a>
                         </h3>
-                        {% if book['subtitle'] %}
-                            <p class="card-text"><i>{{ book['subtitle'] }}</i></p>
+                        {% if book.subtitle %}
+                            <p class="card-text"><i>{{ book.subtitle }}</i></p>
                         {% endif %}
-                        {% if book['middle_name'] %}
-                            <a class="card-link" href="{{ url_for('author', author_id=book['author_id']) }}">
-                                {{ '{} {}. {}'.format(book['first_name'].capitalize(),
-                                                      book['middle_name'][0].upper(),
-                                                      book['last_name'].capitalize()) }}
+                        {% if author.middle_name %}
+                            <a class="card-link" href="{{ url_for('author', author_id=author.author_id) }}">
+                                {{ '{} {}. {}'.format(author.first_name.capitalize(),
+                                                      author.middle_name[0].upper(),
+                                                      author.last_name.capitalize()) }}
                             </a>
                         {% else %}
-                            <a class="card-link" href="{{ url_for('author', author_id=book['author_id']) }}">
-                                {{ '{} {}'.format(book['first_name'].capitalize(), book['last_name'].capitalize()) }}
+                            <a class="card-link" href="{{ url_for('author', author_id=author.author_id) }}">
+                                {{ '{} {}'.format(author.first_name.capitalize(), author.last_name.capitalize()) }}
                             </a>
                         {% endif %}
                     </div>

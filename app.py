@@ -2,8 +2,8 @@ from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from forms import LoginForm, RegisterForm
-import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -11,14 +11,6 @@ app.config.from_object(Config)
 # Create database and import table classes
 db = SQLAlchemy(app)
 from models import User, Book, Author
-
-
-def connect_to_db():
-    return pymysql.connect(host=app.config['HOSTNAME'],
-                           user=app.config['USERNAME'],
-                           password=app.config['PASSWORD'],
-                           db=app.config['DATABASE'],
-                           cursorclass=pymysql.cursors.DictCursor)
 
 
 @app.route('/')
@@ -43,9 +35,9 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        temp_user = db.session.query(User).filter(User.email == form.email.data).first()
-        if temp_user:
-            if check_password_hash(temp_user.password, form.password.data):
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            if check_password_hash(user.password, form.password.data):
                 return redirect(url_for('index'))
 
         return '<h1>Invalid email or password</h1>'
@@ -53,80 +45,23 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 
-@app.route('/user/<user_id>')
-def user(user_id):
-    pass
-
-
 @app.route('/books')
 def books():
-    connection = connect_to_db()
-    try:
-        with connection.cursor() as cursor:
-            query = (
-                'SELECT * '
-                'FROM book '
-                'JOIN author '
-                'USING (author_id)'
-            )
-            cursor.execute(query)
-            result = cursor.fetchall()
-            return render_template('books.html', books=result)
-
-    except Exception as e:
-        print(e)
-    finally:
-        connection.close()
+    result = db.session.query(Book, Author).join(Author).all()
+    return render_template('books.html', books=result)
 
 
 @app.route('/book/<book_id>')
 def book(book_id):
-    connection = connect_to_db()
-    try:
-        with connection.cursor() as cursor:
-            query = (
-                'SELECT * '
-                'FROM book '
-                'JOIN author '
-                'USING (author_id)'
-                f'WHERE book.book_id={book_id}'
-            )
-            cursor.execute(query)
-            result = cursor.fetchone()
-            return render_template('book.html', book=result)
-
-    except Exception as e:
-        print(e)
-    finally:
-        connection.close()
+    book, author = db.session.query(Book, Author).join(Author).filter(Book.book_id == book_id).one()
+    return render_template('book.html', book=book, author=author)
 
 
 @app.route('/author/<author_id>')
 def author(author_id):
-    connection = connect_to_db()
-    try:
-        with connection.cursor() as cursor:
-            query = (
-                'SELECT * '
-                'FROM author '
-                f'WHERE author_id={author_id}'
-            )
-            cursor.execute(query)
-            result_author = cursor.fetchone()
-
-            query = (
-                'SELECT * '
-                'FROM book '
-                f'WHERE book.author_id={author_id}'
-            )
-            cursor.execute(query)
-            result_books = cursor.fetchall()
-            return render_template('author.html', author=result_author, books=result_books)
-
-    except Exception as e:
-        print(e)
-    finally:
-        connection.close()
+    author = db.session.query(Author).filter(Author.author_id == author_id).one()
+    books = db.session.query(Book).filter(Book.author_id == author_id).all()
+    return render_template('author.html', author=author, books=books)
 
 
 if __name__ == '__main__':

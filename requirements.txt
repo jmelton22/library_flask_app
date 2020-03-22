@@ -1,4 +1,3 @@
-sqlalchemy
 # This file is used by pip to install required python packages
 # Usage: pip install -r requirements.txt
 
@@ -18,8 +17,8 @@ Flask-WTF==0.14.3
 wtforms
 
 # SQL Packages
+sqlalchemy
 mysqlclient==1.4.6
-PyMySQL==0.9.3
 cryptography==2.8
 
 # .env file support
