@@ -21,6 +21,16 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    pass
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    pass
+
+
 @app.route('/books')
 def books():
     connection = connect_to_db()
