@@ -18,4 +18,8 @@ class Author(Base, db.Model):
     __tablename__ = 'author'
 
 
+class UserBook(Base, db.Model):
+    __tablename__ = 'userbook'
+
+
 Base.prepare(db.engine, reflect=True)

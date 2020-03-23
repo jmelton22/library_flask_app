@@ -12,7 +12,7 @@ login_manager.login_view = 'login'
 
 # Create database and import table classes
 db = SQLAlchemy(app)
-from models import User, Book, Author
+from models import User, Book, Author, UserBook
 
 
 @app.route('/')
@@ -78,6 +78,23 @@ def author(author_id):
     author = db.session.query(Author).filter(Author.author_id == author_id).one()
     books = db.session.query(Book).filter(Book.author_id == author_id).all()
     return render_template('author.html', author=author, books=books)
+
+
+@app.route('/book/<book_id>/checkout', methods=['GET', 'POST'])
+@login_required
+def checkout(book_id):
+    book = Book.query.filter_by(book_id=book_id).first()
+
+    if book.num_copies > 0:
+        user_book = UserBook(user_id=current_user.id, book_id=int(book_id))
+        book.num_copies -= 1
+
+        db.session.add(user_book)
+        db.session.commit()
+
+        return redirect(url_for('book', book_id=book_id))
+    else:
+        return '<h1>No copies remaining</h1>'
 
 
 if __name__ == '__main__':
