@@ -12,7 +12,7 @@ login_manager.login_view = 'login'
 
 # Create database and import table classes
 db = SQLAlchemy(app)
-from models import User, Book, Author, UserBook
+from models import User, Book, Author, Genre, UserBook
 
 
 @app.route('/')
@@ -25,7 +25,10 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='sha256')
-        new_user = User(email=form.email.data, password=hashed_password)
+        new_user = User(first_name=form.first_name.data,
+                        last_name=form.last_name.data,
+                        email=form.email.data,
+                        password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
@@ -86,7 +89,7 @@ def checkout(book_id):
     book = Book.query.filter_by(book_id=book_id).first()
 
     if book.num_copies > 0:
-        user_book = UserBook(user_id=current_user.id, book_id=int(book_id))
+        user_book = UserBook(user_id=current_user.user_id, book_id=int(book_id))
         book.num_copies -= 1
 
         db.session.add(user_book)

@@ -7,19 +7,26 @@ Base = automap_base()
 
 
 class User(UserMixin, Base, db.Model):
-    __tablename__ = 'user'
+    __tablename__ = 'User'
+
+    def get_id(self):
+        return self.user_id
 
 
 class Book(Base, db.Model):
-    __tablename__ = 'book'
+    __tablename__ = 'Book'
 
 
 class Author(Base, db.Model):
-    __tablename__ = 'author'
+    __tablename__ = 'Author'
+
+
+class Genre(Base, db.Model):
+    __tablename__ = 'Genre'
 
 
 class UserBook(Base, db.Model):
-    __tablename__ = 'userbook'
+    __tablename__ = 'UserBook'
 
 
 Base.prepare(db.engine, reflect=True)
