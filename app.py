@@ -25,6 +25,7 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='sha256')
+        # noinspection PyArgumentList
         new_user = User(first_name=form.first_name.data,
                         last_name=form.last_name.data,
                         email=form.email.data,
@@ -66,14 +67,14 @@ def logout():
 
 @app.route('/books')
 def books():
-    result = db.session.query(Book, Author).join(Author).all()
+    result = db.session.query(Book, Author).join(Author).order_by(Book.title).all()
     return render_template('books.html', books=result)
 
 
 @app.route('/book/<book_id>')
 def book(book_id):
-    book, author = db.session.query(Book, Author).join(Author).filter(Book.book_id == book_id).one()
-    return render_template('book.html', book=book, author=author)
+    book, author, genre = db.session.query(Book, Author, Genre).join(Author).join(Genre).filter(Book.book_id == book_id).one()
+    return render_template('book.html', book=book, author=author, genre=genre)
 
 
 @app.route('/author/<author_id>')
