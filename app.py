@@ -12,7 +12,7 @@ login_manager.login_view = 'login'
 
 # Create database and import table classes
 db = SQLAlchemy(app)
-from models import User, Book, Author, Genre, UserBook
+from models import *
 
 
 @app.route('/')
