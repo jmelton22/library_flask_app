@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <p>
+        {{ '{} {}'.format(user['first_name'].capitalize(),
+                          user['last_name'].capitalize()) }}
+    </p>
+
+    <a type="button" class="btn btn-secondary" href="{{ url_for('edit_user', user_id=current_user.user_id) }}">Edit Profile</a>
+    <br>
+    <p>Current Checked-out Books:</p>
+    <ul>
+    {% for book in books %}
+        <li>
+            {{ book[0]['title'] }}
+            {{ book[1]['first_name'] + ' ' + book[1]['last_name'] }}
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}

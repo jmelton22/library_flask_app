@@ -18,3 +18,10 @@ class RegisterForm(FlaskForm):
     email = StringField('Email', validators=[InputRequired(), Email(message='Invalid email')])
     password = PasswordField('Password', validators=[InputRequired()])
     submit = SubmitField('Sign Up')
+
+
+class EditProfile(FlaskForm):
+    first_name = StringField('First Name', validators=[InputRequired()])
+    last_name = StringField('Last Name', validators=[InputRequired()])
+    email = StringField('Email', validators=[InputRequired(), Email(message='Invalid email')])
+    submit = SubmitField('Update Profile')

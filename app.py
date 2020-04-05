@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
-from forms import LoginForm, RegisterForm
+from forms import LoginForm, RegisterForm, EditProfile
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 
@@ -65,6 +65,27 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route('/user/<user_id>')
+@login_required
+def user(user_id):
+    user = User.query.filter_by(user_id=user_id).first()
+    books = db.session.query(Book, Author, UserBook).join(Author).join(UserBook).filter_by(user_id=user_id).all()
+    return render_template('user.html', user=user, books=books)
+
+
+@app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
+def edit_user(user_id):
+    user = User.query.filter_by(user_id=user_id).first()
+    form = EditProfile(obj=user)
+    if form.validate_on_submit():
+        form.populate_obj(user)
+        db.session.commit()
+
+        return redirect(url_for('user', user_id=user_id))
+
+    return render_template('edit_user.html', user=user, form=form)
+
+
 @app.route('/books')
 def books():
     result = db.session.query(Book, Author).join(Author).order_by(Book.title).all()
@@ -89,9 +110,10 @@ def author(author_id):
 def checkout(book_id):
     book = Book.query.filter_by(book_id=book_id).first()
 
-    if book.num_copies > 0:
+    # TODO: Update method to handle separate library catalogs
+    if True:
         user_book = UserBook(user_id=current_user.user_id, book_id=int(book_id))
-        book.num_copies -= 1
+        # book.num_copies -= 1
 
         db.session.add(user_book)
         db.session.commit()
