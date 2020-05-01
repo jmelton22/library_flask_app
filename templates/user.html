@@ -14,6 +14,7 @@
         <li>
             {{ book[0]['title'] }}
             {{ book[1]['first_name'] + ' ' + book[1]['last_name'] }}
+            <a type="button" class="btn btn-secondary" href="{{ url_for('return_book', user_id=current_user.user_id, book_id=book[0]['book_id']) }}">Return</a>
         </li>
     {% endfor %}
     </ul>

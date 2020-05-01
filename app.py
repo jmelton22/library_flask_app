@@ -4,6 +4,8 @@ from config import Config
 from forms import LoginForm, RegisterForm, EditProfile
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
+from sqlalchemy import text
+from sqlalchemy.sql import exists
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -86,6 +88,16 @@ def edit_user(user_id):
     return render_template('edit_user.html', user=user, form=form)
 
 
+@app.route('/user/<user_id>/return/<book_id>')
+def return_book(user_id, book_id):
+    conn = db.session.connection()
+    conn.execute(text("CALL return_book(:u_id, :b_id)"),
+                 u_id=user_id, b_id=book_id)
+    db.session.commit()
+    conn.close()
+    return redirect(url_for('user', user_id=user_id))
+
+
 @app.route('/books')
 def books():
     result = db.session.query(Book, Author).join(Author).order_by(Book.title).all()
@@ -108,19 +120,14 @@ def author(author_id):
 @app.route('/book/<book_id>/checkout', methods=['GET', 'POST'])
 @login_required
 def checkout(book_id):
-    book = Book.query.filter_by(book_id=book_id).first()
 
-    # TODO: Update method to handle separate library catalogs
-    if True:
-        user_book = UserBook(user_id=current_user.user_id, book_id=int(book_id))
-        # book.num_copies -= 1
+    conn = db.session.connection()
+    conn.execute(text("CALL checkout_book(:u_id, :b_id)"),
+                 u_id=current_user.user_id, b_id=book_id)
+    db.session.commit()
+    conn.close()
 
-        db.session.add(user_book)
-        db.session.commit()
-
-        return redirect(url_for('book', book_id=book_id))
-    else:
-        return '<h1>No copies remaining</h1>'
+    return redirect(url_for('book', book_id=book_id))
 
 
 if __name__ == '__main__':
