@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
 from wtforms.validators import InputRequired, Email
 
 
@@ -17,6 +17,7 @@ class RegisterForm(FlaskForm):
     last_name = StringField('Last Name', validators=[InputRequired()])
     email = StringField('Email', validators=[InputRequired(), Email(message='Invalid email')])
     password = PasswordField('Password', validators=[InputRequired()])
+    library = SelectField('Library', validators=[InputRequired()], coerce=int)
     submit = SubmitField('Sign Up')
 
 

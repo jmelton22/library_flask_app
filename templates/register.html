@@ -41,6 +41,16 @@
             {% endfor %}
         </p>
         <p>
+            {{ form.library.label }}
+            <br>
+            {{ form.library }}
+            <br>
+            {% for error in form.library.errors %}
+                <span class="text-danger">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+        <p>
             {{ form.submit() }}
         </p>
     </form>

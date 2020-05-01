@@ -25,13 +25,15 @@ def index():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
+    form.library.choices = [(lib.library_id, lib.library_name) for lib in Library.query.order_by('library_name')]
     if form.validate_on_submit():
         hashed_password = generate_password_hash(form.password.data, method='sha256')
         # noinspection PyArgumentList
         new_user = User(first_name=form.first_name.data,
                         last_name=form.last_name.data,
                         email=form.email.data,
-                        password=hashed_password)
+                        password=hashed_password,
+                        library_id=form.library.data)
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
