@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 
 class Config:
     USERNAME = os.environ['USERNAME']

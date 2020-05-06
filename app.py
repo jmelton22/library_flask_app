@@ -131,6 +131,28 @@ def checkout(book_id):
 
     return redirect(url_for('book', book_id=book_id))
 
+@app.route('/book/<book_id>/hold', methods=['GET', 'POST'])
+@login_required
+def hold(book_id):
+
+    conn = db.session.connection()
+    conn.execute(text("CALL hold_book(:u_id, :b_id)"),
+                 u_id=current_user.user_id, b_id=book_id)
+    db.session.commit()
+    conn.close()
+
+    return redirect(url_for('book', book_id=book_id))
+
+@app.route('/user/<user_id>/renew/<book_id>')
+def renew_book(user_id, book_id):
+    conn = db.session.connection()
+    conn.execute(text("CALL renew_book(:u_id, :b_id)"),
+                 u_id=user_id, b_id=book_id)
+    db.session.commit()
+    conn.close()
+    return redirect(url_for('user', user_id=user_id))
+
+
 
 if __name__ == '__main__':
     app.run()
