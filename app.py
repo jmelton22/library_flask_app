@@ -5,7 +5,7 @@ from forms import LoginForm, RegisterForm, EditProfile
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from sqlalchemy import text
-from sqlalchemy.sql import exists
+from datetime import datetime
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -74,7 +74,7 @@ def logout():
 def user(user_id):
     user = User.query.filter_by(user_id=user_id).first()
     books = db.session.query(Book, Author, UserBook).join(Author).join(UserBook).filter_by(user_id=user_id).all()
-    return render_template('user.html', user=user, books=books)
+    return render_template('user.html', user=user, books=books, today=datetime.now())
 
 
 @app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
@@ -122,7 +122,6 @@ def author(author_id):
 @app.route('/book/<book_id>/checkout', methods=['GET', 'POST'])
 @login_required
 def checkout(book_id):
-
     conn = db.session.connection()
     conn.execute(text("CALL checkout_book(:u_id, :b_id)"),
                  u_id=current_user.user_id, b_id=book_id)
@@ -131,10 +130,10 @@ def checkout(book_id):
 
     return redirect(url_for('book', book_id=book_id))
 
+
 @app.route('/book/<book_id>/hold', methods=['GET', 'POST'])
 @login_required
 def hold(book_id):
-
     conn = db.session.connection()
     conn.execute(text("CALL hold_book(:u_id, :b_id)"),
                  u_id=current_user.user_id, b_id=book_id)
@@ -142,6 +141,7 @@ def hold(book_id):
     conn.close()
 
     return redirect(url_for('book', book_id=book_id))
+
 
 @app.route('/user/<user_id>/renew/<book_id>')
 def renew_book(user_id, book_id):

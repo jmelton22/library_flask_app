@@ -9,14 +9,28 @@
     <a type="button" class="btn btn-secondary" href="{{ url_for('edit_user', user_id=current_user.user_id) }}">Edit Profile</a>
     <br>
     <p>Current Checked-out Books:</p>
-    <ul>
-    {% for book in books %}
-        <li>
-            {{ book[0]['title'] }}
-            {{ book[1]['first_name'] + ' ' + book[1]['last_name'] }}
-            <a type="button" class="btn btn-secondary" href="{{ url_for('return_book', user_id=current_user.user_id, book_id=book[0]['book_id']) }}">Return</a>
-             <a type="button" class="btn btn-secondary" href="{{ url_for('renew_book', user_id=current_user.user_id, book_id=book[0]['book_id']) }}">Renew</a>
-        </li>
+    <table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Author</th>
+            <th scope="col">Due Date</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+            {% if book[2]['due_date'] >= today %}
+                <tr>
+                    <td>{{ book[0]['title'] }}</td>
+                    <td>{{ book[1]['first_name'] + ' ' + book[1]['last_name'] }}</td>
+                    <td>{{ book[2]['due_date'].strftime('%Y-%m-%d') }}</td>
+                    <td><a type="button" class="btn btn-secondary" href="{{ url_for('return_book', user_id=current_user.user_id, book_id=book[0]['book_id']) }}">Return</a></td>
+                    <td><a type="button" class="btn btn-secondary" href="{{ url_for('renew_book', user_id=current_user.user_id, book_id=book[0]['book_id']) }}">Renew</a></td>
+                </tr>
+            {% endif %}
     {% endfor %}
-    </ul>
+    </tbody>
+    </table>
 {% endblock %}

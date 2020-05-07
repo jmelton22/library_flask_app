@@ -25,9 +25,7 @@
                         {% endif %}
                         <hr>
                         <a role="button" class="btn btn-dark btn-sm" href="{{ url_for('checkout', book_id=book.book_id) }}">Check Out</a>
-
-                         <hr>
-                        <a role="button" class="btn btn-dark btn-sm" href="{{ url_for('hold', book_id=book.book_id) }}">Hold</a>
+                        <a role="button" class="btn btn-dark btn-sm" href="{{ url_for('hold', book_id=book.book_id) }}">Place Hold</a>
                     </div>
                 </div>
             </div>
