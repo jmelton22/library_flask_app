@@ -26,7 +26,7 @@
                     <td>{{ book[0]['title'] }}</td>
                     <td>{{ book[1]['first_name'] + ' ' + book[1]['last_name'] }}</td>
                     <td>{{ book[2]['due_date'].strftime('%Y-%m-%d') }}</td>
-                    <td><a type="button" class="btn btn-secondary" href="{{ url_for('return_book', user_id=current_user.user_id, book_id=book[0]['book_id']) }}">Return</a></td>
+                    <td><a type="button" class="btn btn-secondary" href="{{ url_for('return_book', user_id=current_user.user_id, book_id=book[0]['book_id'], checkout_date=book[2]['checkout_date']) }}">Return</a></td>
                     <td><a type="button" class="btn btn-secondary" href="{{ url_for('renew_book', user_id=current_user.user_id, book_id=book[0]['book_id']) }}">Renew</a></td>
                 </tr>
             {% endif %}

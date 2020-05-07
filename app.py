@@ -91,10 +91,10 @@ def edit_user(user_id):
 
 
 @app.route('/user/<user_id>/return/<book_id>')
-def return_book(user_id, book_id):
+def return_book(user_id, book_id, checkout_date):
     conn = db.session.connection()
-    conn.execute(text("CALL return_book(:u_id, :b_id)"),
-                 u_id=user_id, b_id=book_id)
+    conn.execute(text("CALL return_book(:u_id, :b_id, :c_date)"),
+                 u_id=user_id, b_id=book_id, c_date=checkout_date)
     db.session.commit()
     conn.close()
     return redirect(url_for('user', user_id=user_id))
@@ -151,7 +151,6 @@ def renew_book(user_id, book_id):
     db.session.commit()
     conn.close()
     return redirect(url_for('user', user_id=user_id))
-
 
 
 if __name__ == '__main__':
