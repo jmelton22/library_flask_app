@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
-from forms import LoginForm, RegisterForm, EditProfile
+from forms import LoginForm, RegisterForm, EditProfile, DeleteProfile
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from sqlalchemy import text
@@ -152,6 +152,18 @@ def renew_book(user_id, book_id):
     conn.close()
     return redirect(url_for('user', user_id=user_id))
 
+
+@app.route('/user/<user_id>/delete', methods=['GET', 'POST'])
+def delete_user(user_id):
+    user = User.query.filter_by(user_id=user_id).first()
+    form = DeleteProfile(obj=user)
+    if form.validate_on_submit():
+        form.populate_obj(user)
+        db.session.commit()
+
+        return redirect(url_for('user', user_id=user_id))
+
+    return render_template('delete_user.html', user=user, form=form)
 
 
 if __name__ == '__main__':
