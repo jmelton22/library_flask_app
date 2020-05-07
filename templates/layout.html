@@ -18,8 +18,14 @@
             <li class="nav-item active">
                 <a class="nav-link" href="/">Home</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('books') }}">Books</a>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbardropBooks" data-toggle="dropdown">Books</a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="{{ url_for('books') }}">View Books</a>
+                    <a class="dropdown-item" href="#">Add Books</a>
+                     <a class="dropdown-item" href="#">Edit Books</a>
+                    <a class="dropdown-item" href="#">Delete Books</a>
+                </div>
             </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">Libraries</a>

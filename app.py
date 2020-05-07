@@ -5,7 +5,7 @@ from forms import LoginForm, RegisterForm, EditProfile
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from sqlalchemy import text
-from datetime import datetime
+from sqlalchemy.sql import exists
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -33,7 +33,8 @@ def register():
                         last_name=form.last_name.data,
                         email=form.email.data,
                         password=hashed_password,
-                        library_id=form.library.data)
+                        library_id=form.library.data,
+                        role='user')
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
@@ -62,6 +63,31 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 
+@app.route('/user/<user_id>/add', methods=['GET', 'POST'])
+def add(user_id):
+    if current_user.role == 'admin':
+        form = RegisterForm()
+        form.library.choices = [(lib.library_id, lib.library_name) for lib in Library.query.order_by('library_name')]
+        if form.validate_on_submit():
+            hashed_password = generate_password_hash(form.password.data, method='sha256')
+            # noinspection PyArgumentList
+            new_user = User(first_name=form.first_name.data,
+                            last_name=form.last_name.data,
+                            email=form.email.data,
+                            password=hashed_password,
+                            library_id=form.library.data,
+                            role='librarian')
+            db.session.add(new_user)
+            db.session.commit()
+
+            return redirect(url_for('user', user_id=current_user.user_id))
+
+        return render_template('add_librarian.html', title='Add New Librarian', form=form)
+
+    elif current_user.role == 'librarian':
+        books = Book.query.all()
+
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -74,7 +100,15 @@ def logout():
 def user(user_id):
     user = User.query.filter_by(user_id=user_id).first()
     books = db.session.query(Book, Author, UserBook).join(Author).join(UserBook).filter_by(user_id=user_id).all()
-    return render_template('user.html', user=user, books=books, today=datetime.now())
+    if current_user.role == 'user':
+        return render_template('user.html', user=user, books=books)
+    elif current_user.role == 'librarian':
+        return render_template('librarian.html')
+    elif current_user.role == 'admin':
+        librarians = db.session.query(User, Library).filter_by(role='librarian').join(Library).all()
+        return render_template('admin.html', librarians=librarians)
+    else:
+        return redirect(url_for('index'))
 
 
 @app.route('/user/<user_id>/edit', methods=['GET', 'POST'])
@@ -91,10 +125,10 @@ def edit_user(user_id):
 
 
 @app.route('/user/<user_id>/return/<book_id>')
-def return_book(user_id, book_id, checkout_date):
+def return_book(user_id, book_id):
     conn = db.session.connection()
-    conn.execute(text("CALL return_book(:u_id, :b_id, :c_date)"),
-                 u_id=user_id, b_id=book_id, c_date=checkout_date)
+    conn.execute(text("CALL return_book(:u_id, :b_id)"),
+                 u_id=user_id, b_id=book_id)
     db.session.commit()
     conn.close()
     return redirect(url_for('user', user_id=user_id))
@@ -122,6 +156,7 @@ def author(author_id):
 @app.route('/book/<book_id>/checkout', methods=['GET', 'POST'])
 @login_required
 def checkout(book_id):
+
     conn = db.session.connection()
     conn.execute(text("CALL checkout_book(:u_id, :b_id)"),
                  u_id=current_user.user_id, b_id=book_id)
@@ -134,6 +169,7 @@ def checkout(book_id):
 @app.route('/book/<book_id>/hold', methods=['GET', 'POST'])
 @login_required
 def hold(book_id):
+
     conn = db.session.connection()
     conn.execute(text("CALL hold_book(:u_id, :b_id)"),
                  u_id=current_user.user_id, b_id=book_id)
@@ -151,6 +187,16 @@ def renew_book(user_id, book_id):
     db.session.commit()
     conn.close()
     return redirect(url_for('user', user_id=user_id))
+
+
+@app.route('/user/<user_id>/delete', methods=['GET', 'POST'])
+def delete_user(user_id):
+    User.query.filter_by(user_id=user_id).delete()
+    db.session.commit()
+    if current_user.role == 'admin':
+        return redirect(url_for('user', user_id=current_user.user_id))
+    else:
+        return redirect('index')
 
 
 if __name__ == '__main__':
