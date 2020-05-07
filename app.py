@@ -102,7 +102,7 @@ def return_book(user_id, book_id):
 
 @app.route('/books')
 def books():
-    result = db.session.query(Book, Author).join(Author).order_by(Book.title).all()
+    result = db.session.query(Book, Author).join(Author).join(LibraryCatalog).order_by(Book.title).filter(LibraryCatalog.num_copies > 0).all()
     return render_template('books.html', books=result)
 
 
