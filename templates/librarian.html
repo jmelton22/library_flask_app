@@ -5,10 +5,10 @@
         {{ '{} {}'.format(user['first_name'].capitalize(),
                           user['last_name'].capitalize()) }}
     </p>
+    <p>
+        {{ library['library_name'] }}
+    </p>
 
-    <a type="button" class="btn btn-secondary" href="{{ url_for('add_book', user_id=current_user.user_id) }}">Edit Profile</a>
-    <br>
-    <a type="button" class="btn btn-secondary" href="{{ url_for('delete_book', user_id=current_user.user_id) }}">Delete Profile</a>
-
+    <a type="button" class="btn btn-secondary" href="{{ url_for('add', user_id=current_user.user_id) }}">Add Book</a>
 
 {% endblock %}

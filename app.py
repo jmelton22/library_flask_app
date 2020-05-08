@@ -1,11 +1,11 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
-from forms import LoginForm, RegisterForm, EditProfile
+from forms import LoginForm, RegisterForm, EditProfile, AddBook
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from sqlalchemy import text
-from sqlalchemy.sql import exists
+from datetime import datetime
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -85,7 +85,12 @@ def add(user_id):
         return render_template('add_librarian.html', title='Add New Librarian', form=form)
 
     elif current_user.role == 'librarian':
-        books = Book.query.all()
+        form = AddBook()
+        form.genre.choices = [(g.genre_id, g.name) for g in Genre.query.order_by('genre_name')]
+        if form.validate_on_submit():
+            pass
+
+        return render_template('add_book.html', title='Add New Book', form=form)
 
 
 @app.route('/logout')
@@ -101,9 +106,10 @@ def user(user_id):
     user = User.query.filter_by(user_id=user_id).first()
     books = db.session.query(Book, Author, UserBook).join(Author).join(UserBook).filter_by(user_id=user_id).all()
     if current_user.role == 'user':
-        return render_template('user.html', user=user, books=books)
+        return render_template('user.html', user=user, books=books, today=datetime.today())
     elif current_user.role == 'librarian':
-        return render_template('librarian.html')
+        library = Library.query.filter_by(library_id=user.library_id).first()
+        return render_template('librarian.html', user=user, library=library)
     elif current_user.role == 'admin':
         librarians = db.session.query(User, Library).filter_by(role='librarian').join(Library).all()
         return render_template('admin.html', librarians=librarians)

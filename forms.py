@@ -21,6 +21,15 @@ class RegisterForm(FlaskForm):
     submit = SubmitField('Sign Up')
 
 
+class AddBook(FlaskForm):
+    title = StringField('Title', validators=[InputRequired()])
+    subtitle = StringField('Subtitle')
+    first_name = StringField('Author First Name', validators=[InputRequired()])
+    last_name = StringField('Author Last Name', validators=[InputRequired()])
+    genre = SelectField('Genre', validators=[InputRequired()], coerce=int)
+    submit = SubmitField('Add Book')
+
+
 class EditProfile(FlaskForm):
     first_name = StringField('First Name', validators=[InputRequired()])
     last_name = StringField('Last Name', validators=[InputRequired()])
