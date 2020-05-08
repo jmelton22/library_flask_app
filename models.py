@@ -37,8 +37,4 @@ class LibraryCatalog(Base, db.Model):
     __tablename__ = 'LibraryCatalog'
 
 
-class Admin(Base, db.Model):
-    __tablename__ = 'Admin'
-
-
 Base.prepare(db.engine, reflect=True)
